@@ -11,12 +11,22 @@ var build = "development"
 var (
 	listenAddress = flag.String("web.listen-address", ":9123", "Address on which to expose metrics and web interface.")
 	metricsPath   = flag.String("web.metrics-path", "/metrics", "Path under which to expose metrics.")
+	configPath    = flag.String("config.file", "dummy.json", "Dummy exporter configuration file.")
 )
 
 func main() {
+	flag.Parse()
 
-	// Handle metrics endpoint
-	var dummy DummyMetricHandler
+	var config Config
+
+	if err := config.LoadConfig(*configPath); err != nil {
+		log.Fatal("Error loading config", "err", err)
+	}
+
+	dummy := DummyMetricHandler{
+		Metrics: config.Metrics,
+	}
+
 	http.Handle(*metricsPath, dummy)
 
 	// Let the User know where the metrics endpoint is
@@ -35,5 +45,4 @@ func main() {
 	log.Printf("Listening on address: %s", *listenAddress)
 
 	log.Fatal(http.ListenAndServe(*listenAddress, nil))
-
 }

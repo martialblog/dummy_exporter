@@ -1,0 +1,17 @@
+run:
+  skip-files:
+    - '(.+)_test\.go'
+
+linters:
+  disable-all: false
+  enable:
+    - funlen
+    - dogsled
+    - dupl
+    - whitespace
+    - wsl
+    - exportloopref
+  presets:
+    - bugs
+    - unused
+  fast: false

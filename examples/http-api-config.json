@@ -1,0 +1,26 @@
+[
+  {
+  "metric":"http_requests",
+  "labels": {
+    "handler": ["/api", "/user"],
+    "method": ["put", "get", "post"],
+    "code": ["200", "501", "202"]
+  },
+  "type": "counter"
+},
+  {
+  "metric":"http_errors",
+  "labels": {
+    "method": ["put", "post"],
+    "code": ["501", "404"]
+  },
+  "type": "counter"
+},
+  {
+  "metric":"http_current_users",
+  "labels": {
+    "handler": ["/api", "/user"]
+  },
+  "type": "gauge"
+}
+]

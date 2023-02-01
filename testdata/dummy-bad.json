@@ -1,0 +1,18 @@
+[
+  {
+  "labels": {
+    "no": "metric-name"
+  },
+  "type": "counter"
+},
+  {
+  "metric": "no-type",
+  "labels": {
+    "job":"foo",
+    "instance":"bar"
+  }
+},
+  {
+  "metric": "no-labels"
+}
+]

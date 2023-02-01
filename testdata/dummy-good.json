@@ -1,0 +1,17 @@
+[
+  {
+  "metric":"foobar",
+  "labels": {
+    "job": ["foo"],
+    "instance": ["foo.1", "foo.2"]
+  },
+  "type": "counter"
+},
+  {
+  "metric":"barfoo",
+  "labels": {
+    "job": ["foo"]
+  },
+  "type": "gauge"
+}
+]
