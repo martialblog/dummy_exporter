@@ -13,6 +13,7 @@ type Config struct {
 }
 
 // TODO LabelName regexp.MustCompile("^[a-zA-Z_][a-zA-Z0-9_]*$")
+// TODO Add range parameter to specify random min,max?
 type Metric struct {
 	Name   string              `json:"metric"`
 	Labels map[string][]string `json:"labels"`
@@ -41,6 +42,7 @@ func (m *Metric) Render(value int) string {
 	return sb.String()
 }
 
+// Loads Configuration File
 func (c *Config) LoadConfig(confFile string) (err error) {
 	conf, err := os.ReadFile(confFile)
 
@@ -60,6 +62,7 @@ func (c *Config) LoadConfig(confFile string) (err error) {
 	return nil
 }
 
+// Renders Labels are a Slice of Slices
 func (m *Metric) RenderLabels() [][]string {
 	result := make([][]string, 0, len(m.Labels))
 
@@ -76,6 +79,7 @@ func (m *Metric) RenderLabels() [][]string {
 	return result
 }
 
+// Permutes Slices of Strings
 func permute(input ...[]string) (result []string) {
 	{
 		var n = 1
