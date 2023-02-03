@@ -4,34 +4,54 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"os"
 	"sort"
 	"strings"
 )
+
+var counters map[string]int
+
+func init() {
+	counters = make(map[string]int)
+}
 
 type Config struct {
 	Metrics []Metric
 }
 
 // TODO LabelName regexp.MustCompile("^[a-zA-Z_][a-zA-Z0-9_]*$")
-// TODO Add range parameter to specify random min,max?
 type Metric struct {
 	Name   string              `json:"metric"`
 	Labels map[string][]string `json:"labels"`
 	Type   string              `json:"type"`
+	// Min    int                 `json:"min"`
+	// Max    int                 `json:"max"`
 }
 
 // Renders the Metric in the Exposition Format with the given value.
 // # HELP http_requests_total The total number of HTTP requests.
 // # TYPE http_requests_total counter
 // http_requests_total{method="post",code="200"}
-func (m *Metric) Render(value int) string {
+func (m *Metric) String() string {
 	renderedLabels := m.RenderLabels()
 	labels := permute(renderedLabels...)
 
 	var sb strings.Builder
+	var value int
 
 	for _, lbs := range labels {
+		// If Gauge, use a random value
+		if m.Type == "gauge" {
+			value = rand.Intn(10-1) + 1
+		}
+
+		// If Counter, increase counter and append
+		if m.Type == "counter" {
+			counters[lbs] = counters[lbs] + rand.Intn(10-1) + 1
+			value = counters[lbs]
+		}
+
 		s := fmt.Sprintf("%s\n%s\n%s\n",
 			fmt.Sprintf("# HELP %s", m.Name),
 			fmt.Sprintf("# TYPE %s %s", m.Name, m.Type),

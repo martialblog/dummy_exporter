@@ -2,6 +2,7 @@ package main
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -99,8 +100,7 @@ func TestMetrics(t *testing.T) {
 				},
 				Type: "gauge",
 			},
-			value:    1,
-			expected: "# HELP foogauge\n# TYPE foogauge gauge\ndummy_foogauge{in=\"bar\"} 1\n",
+			expected: "# HELP foogauge\n# TYPE foogauge gauge\ndummy_foogauge{in=\"bar\"}",
 		},
 		"counter": {
 			metric: Metric{
@@ -110,15 +110,14 @@ func TestMetrics(t *testing.T) {
 				},
 				Type: "counter",
 			},
-			value:    4,
-			expected: "# HELP foocounter\n# TYPE foocounter counter\ndummy_foocounter{job=\"foo\"} 4\n",
+			expected: "# HELP foocounter\n# TYPE foocounter counter\ndummy_foocounter{job=\"foo\"}",
 		},
 	}
 
 	for name, tc := range testcases {
 		t.Run(name, func(t *testing.T) {
-			actual := tc.metric.Render(tc.value)
-			if actual != tc.expected {
+			actual := tc.metric.String()
+			if !strings.Contains(actual, tc.expected) {
 				t.Error("\nActual: ", actual, "\nExpected: ", tc.expected)
 			}
 		})
