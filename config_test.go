@@ -2,7 +2,6 @@ package main
 
 import (
 	"reflect"
-	"strings"
 	"testing"
 )
 
@@ -79,7 +78,6 @@ func TestRenderLabels(t *testing.T) {
 		[]string{"in=\"1\",", "in=\"2\",", "in=\"3\","},
 	}
 
-	// TODO actual is unsorted
 	actual := m.RenderLabels()
 	if !reflect.DeepEqual(actual, expected) {
 		t.Error("Actual", actual, "Expected", expected)
@@ -97,13 +95,12 @@ func TestMetrics(t *testing.T) {
 			metric: Metric{
 				Name: "foogauge",
 				Labels: map[string][]string{
-					"job":      []string{"foo"},
-					"instance": []string{"bar"},
+					"in": []string{"bar"},
 				},
 				Type: "gauge",
 			},
 			value:    1,
-			expected: "# HELP foogauge\n# TYPE foogauge gauge\ndummy_foogauge",
+			expected: "# HELP foogauge\n# TYPE foogauge gauge\ndummy_foogauge{in=\"bar\"} 1\n",
 		},
 		"counter": {
 			metric: Metric{
@@ -114,14 +111,14 @@ func TestMetrics(t *testing.T) {
 				Type: "counter",
 			},
 			value:    4,
-			expected: "# HELP foocounter\n# TYPE foocounter counter\ndummy_foocounter{",
+			expected: "# HELP foocounter\n# TYPE foocounter counter\ndummy_foocounter{job=\"foo\"} 4\n",
 		},
 	}
 
 	for name, tc := range testcases {
 		t.Run(name, func(t *testing.T) {
 			actual := tc.metric.Render(tc.value)
-			if !strings.Contains(actual, tc.expected) {
+			if actual != tc.expected {
 				t.Error("\nActual: ", actual, "\nExpected: ", tc.expected)
 			}
 		})

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -75,6 +76,11 @@ func (m *Metric) RenderLabels() [][]string {
 
 		result = append(result, at)
 	}
+
+	// Sort before return for easier testing
+	sort.Slice(result, func(i, j int) bool {
+		return len(result[i]) < len(result[j])
+	})
 
 	return result
 }
