@@ -26,6 +26,10 @@ func TestLoadBadConfigs(t *testing.T) {
 			file: "testdata/dummy-invalid.json",
 			want: "Error during Unmarshal: invalid character ':' after array element",
 		},
+		{
+			file: "testdata/does-not-exists.json",
+			want: "Error while opening configuration: open testdata/does-not-exists.json: no such file or directory",
+		},
 	}
 
 	for _, test := range testcases {
