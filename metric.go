@@ -35,8 +35,10 @@ func (m *Metric) String() string {
 	renderedLabels := m.RenderLabels()
 	labels := permute(renderedLabels...)
 
-	var sb strings.Builder
-	var value int
+	var (
+		sb    strings.Builder
+		value int
+	)
 
 	for _, lbs := range labels {
 		// If Gauge, use a random value
