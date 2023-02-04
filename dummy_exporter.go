@@ -6,6 +6,13 @@ import (
 	"net/http"
 )
 
+// nolint: gochecknoglobals
+var (
+	// These get filled at build time with the proper vaules
+	version = "development"
+	commit  = "HEAD"
+)
+
 var build = "development"
 
 var (
@@ -41,7 +48,7 @@ func main() {
 			</html>`))
 	})
 
-	log.Printf("Version: %s", build)
+	log.Printf("Version: %s Commit: %s", version, commit)
 	log.Printf("Listening on address: %s", *listenAddress)
 
 	log.Fatal(http.ListenAndServe(*listenAddress, nil))

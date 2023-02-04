@@ -6,6 +6,10 @@ import (
 	"os"
 )
 
+type Config struct {
+	Metrics []Metric
+}
+
 // Loads Configuration File
 func (c *Config) LoadConfig(confFile string) (err error) {
 	conf, err := os.ReadFile(confFile)

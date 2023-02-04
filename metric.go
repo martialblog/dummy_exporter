@@ -14,10 +14,6 @@ func init() {
 	counters = make(map[string]int)
 }
 
-type Config struct {
-	Metrics []Metric
-}
-
 // TODO LabelName regexp.MustCompile("^[a-zA-Z_][a-zA-Z0-9_]*$")
 type Metric struct {
 	Name   string              `json:"metric"`
