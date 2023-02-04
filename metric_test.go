@@ -60,6 +60,25 @@ func TestMetrics(t *testing.T) {
 		value    int
 		expected string
 	}{
+		"no-type": {
+			metric: Metric{
+				Name: "foo",
+				Labels: map[string][]string{
+					"in": []string{"bar"},
+				},
+			},
+			expected: "# HELP foo\n# TYPE foo \ndummy_foo{in=\"bar\"}",
+		},
+		"wrong-type": {
+			metric: Metric{
+				Name: "foo",
+				Labels: map[string][]string{
+					"in": []string{"bar"},
+				},
+				Type: "unknown",
+			},
+			expected: "# HELP foo\n# TYPE foo unknown\ndummy_foo{in=\"bar\"}",
+		},
 		"gauge": {
 			metric: Metric{
 				Name: "foogauge",

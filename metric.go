@@ -17,8 +17,8 @@ func init() {
 // TODO LabelName regexp.MustCompile("^[a-zA-Z_][a-zA-Z0-9_]*$")
 type Metric struct {
 	Name   string              `json:"metric"`
-	Labels map[string][]string `json:"labels"`
 	Type   string              `json:"type"`
+	Labels map[string][]string `json:"labels"`
 	// Min    int                 `json:"min"`
 	// Max    int                 `json:"max"`
 }
