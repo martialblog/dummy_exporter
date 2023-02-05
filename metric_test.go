@@ -22,6 +22,8 @@ func TestPermute(t *testing.T) {
 }
 
 func BenchmarkPermute(b *testing.B) {
+	b.ReportAllocs()
+
 	for n := 0; n < b.N; n++ {
 		permute(
 			[]string{"job=foo", "job=bar"},
@@ -29,6 +31,23 @@ func BenchmarkPermute(b *testing.B) {
 			[]string{"in=1", "in=2", "in=3"},
 			[]string{"code=200"},
 		)
+	}
+}
+
+func BenchmarkRenderLabels(b *testing.B) {
+	m := Metric{
+		Name: "foo",
+		Labels: map[string][]string{
+			"x": []string{"1", "2"},
+			"y": []string{"1", "2", "3"},
+			"z": []string{"1", "2", "3"},
+		},
+		Type: "gauge",
+	}
+
+	b.ReportAllocs()
+	for n := 0; n < b.N; n++ {
+		m.RenderLabels()
 	}
 }
 

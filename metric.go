@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// Counters for the Counter metrics
 var counters map[string]int
 
 func init() {
