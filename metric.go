@@ -60,14 +60,24 @@ func (m *Metric) String() string {
 	return sb.String()
 }
 
-// Renders Labels are a Slice of Slices
+// Renders Labels (map of []string)
+// into a [][]string containing
+// the labels ready to print. E.g.
+// [{x="foo",}, {x="bar",}]
 func (m *Metric) RenderLabels() [][]string {
 	result := make([][]string, 0, len(m.Labels))
 
-	for name, values := range m.Labels {
-		var at = make([]string, 0, len(values))
+	//Sort Labels
+	sortedLabels := make([]string, 0, len(m.Labels))
+	for k, _ := range m.Labels {
+		sortedLabels = append(sortedLabels, k)
+	}
+	sort.Strings(sortedLabels)
 
-		for _, value := range values {
+	for _, name := range sortedLabels {
+		var at = make([]string, 0, len(m.Labels[name]))
+
+		for _, value := range m.Labels[name] {
 			at = append(at, fmt.Sprintf("%s=\"%s\",", name, value))
 		}
 

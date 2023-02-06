@@ -52,25 +52,46 @@ func BenchmarkRenderLabels(b *testing.B) {
 }
 
 func TestRenderLabels(t *testing.T) {
-	m := Metric{
-		Name: "foo",
-		Labels: map[string][]string{
-			"job": []string{"foo", "bar"},
-			"in":  []string{"1", "2", "3"},
+	testcases := map[string]struct {
+		metric   Metric
+		expected [][]string
+	}{
+		"simple": {
+			metric: Metric{
+				Name: "foo",
+				Labels: map[string][]string{
+					"m": []string{"1"},
+				},
+			},
+			expected: [][]string{
+				[]string{"m=\"1\","},
+			},
 		},
-		Type: "gauge",
+		"sorted": {
+			metric: Metric{
+				Name: "foo",
+				Labels: map[string][]string{
+					"z": []string{"1", "2"},
+					"a": []string{"1", "2"},
+					"m": []string{"1", "2", "3"},
+				},
+			},
+			expected: [][]string{
+				[]string{"a=\"1\",", "a=\"2\","},
+				[]string{"z=\"1\",", "z=\"2\","},
+				[]string{"m=\"1\",", "m=\"2\",", "m=\"3\","},
+			},
+		},
 	}
 
-	expected := [][]string{
-		[]string{"job=\"foo\",", "job=\"bar\","},
-		[]string{"in=\"1\",", "in=\"2\",", "in=\"3\","},
+	for name, tc := range testcases {
+		t.Run(name, func(t *testing.T) {
+			actual := tc.metric.RenderLabels()
+			if !reflect.DeepEqual(actual, tc.expected) {
+				t.Error("Actual", actual, "Expected", tc.expected)
+			}
+		})
 	}
-
-	actual := m.RenderLabels()
-	if !reflect.DeepEqual(actual, expected) {
-		t.Error("Actual", actual, "Expected", expected)
-	}
-
 }
 
 func TestMetrics(t *testing.T) {
