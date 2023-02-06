@@ -1,0 +1,50 @@
+[
+  {
+  "metric":"temp_digital",
+  "type": "gauge",
+  "labels": {
+    "loc": ["nbg"],
+    "device": ["t-1000"]
+  }
+},
+  {
+  "metric":"temp_analog",
+  "type": "gauge",
+  "labels": {
+    "loc": ["nbg"],
+    "device": ["t-1000"]
+  }
+},
+  {
+  "metric":"temp_digital",
+  "type": "gauge",
+  "labels": {
+    "loc": ["muc"],
+    "device": ["t-800"]
+  }
+},
+  {
+  "metric":"temp_analog",
+  "type": "gauge",
+  "labels": {
+    "loc": ["muc"],
+    "device": ["t-800"]
+  }
+},
+  {
+  "metric":"temp_digital",
+  "type": "gauge",
+  "labels": {
+    "loc": ["fra"],
+    "device": ["t-100", "t-200"]
+  }
+},
+  {
+  "metric":"temp_analog",
+  "type": "gauge",
+  "labels": {
+    "loc": ["fra"],
+    "device": ["t-9000", "t-9001"]
+  }
+}
+]

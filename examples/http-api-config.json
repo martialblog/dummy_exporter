@@ -1,25 +1,48 @@
 [
   {
   "metric":"http_requests",
+  "type": "counter",
   "labels": {
-    "handler": ["/api", "/user"],
-    "method": ["put", "get", "post"],
-    "code": ["200", "501", "202"]
-  },
-  "type": "counter"
+    "api": ["/u"],
+    "method": ["GET"]
+  }
 },
   {
   "metric":"http_errors",
+  "type": "counter",
   "labels": {
-    "method": ["put", "post"],
-    "code": ["501", "404"]
-  },
-  "type": "counter"
+    "api": ["/u"],
+    "method": ["GET"]
+  }
+},
+  {
+  "metric":"http_requests",
+  "type": "counter",
+  "labels": {
+    "api": ["/x"],
+    "method": ["POST", "DELETE"]
+  }
+},
+  {
+  "metric":"http_errors",
+  "type": "counter",
+  "labels": {
+    "api": ["/e"],
+    "method": ["DELETE"]
+  }
+},
+  {
+  "metric":"http_errors",
+  "type": "counter",
+  "labels": {
+    "api": ["/x"],
+    "method": ["PUT"]
+  }
 },
   {
   "metric":"http_current_users",
   "labels": {
-    "handler": ["/api", "/user"]
+    "api": ["/x", "/u"]
   },
   "type": "gauge"
 }
