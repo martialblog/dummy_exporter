@@ -1,12 +1,12 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"math/rand"
 	"sort"
 	"strings"
+	"sync"
 )
 
 // Counters for the Counter metrics
@@ -97,7 +97,20 @@ func (m *Metric) String() string {
 // computationally expensive
 func (m *Metric) PermuteLabels() {
 	renderedLabels := m.RenderLabels()
-	m.permutatedLabels = permute(renderedLabels...)
+	l := Product(renderedLabels...)
+
+	// Calculate capacity
+	cap := 0
+	for _, v := range m.Labels {
+		cap = +len(v)
+	}
+
+	// for m.Lables =+ len(lab)
+	lbs := make([]string, 0, cap)
+	for p := range l {
+		lbs = append(lbs, strings.Join(p, ""))
+	}
+	m.permutatedLabels = lbs
 }
 
 // Renders Labels (map of []string)
@@ -132,44 +145,37 @@ func (m *Metric) RenderLabels() [][]string {
 	return result
 }
 
-// Permutes Slices of Strings
-func permute(input ...[]string) (result []string) {
-	{
-		var n = 1
-		for _, elems := range input {
-			n *= len(elems)
-		}
-		// Calculate length of return slice
-		result = make([]string, 0, n)
+// Generates all combinations from a slice of slices
+// A × B = {1,2} × {3,4} = {(1,3), (1,4), (2,3), (2,4)}
+func Product(items ...[]string) chan []string {
+	ch := make(chan []string)
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	iterate(&wg, ch, []string{}, items...)
+
+	go func() { wg.Wait(); close(ch) }()
+
+	return ch
+}
+
+func iterate(wg *sync.WaitGroup, channel chan []string, result []string, items ...[]string) {
+	defer wg.Done()
+
+	// Return of no more elements left
+	if len(items) == 0 {
+		channel <- result
+		return
 	}
 
-	var at = make([]int, len(input))
+	// Shift Items
+	item, items := items[0], items[1:]
 
-	var buf bytes.Buffer
-
-loop:
-	for {
-		// Position Counter
-		for i := len(input) - 1; i >= 0; i-- {
-			if at[i] > 0 && at[i] >= len(input[i]) {
-				if i == 0 || (i == 1 && at[i-1] == len(input[0])-1) {
-					break loop
-				}
-				at[i] = 0
-				at[i-1]++
-			}
-		}
-		// Construct string
-		buf.Reset()
-		for i, ar := range input {
-			var p = at[i]
-			if p >= 0 && p < len(ar) {
-				buf.WriteString(ar[p])
-			}
-		}
-		result = append(result, buf.String())
-		at[len(input)-1]++
+	for i := 0; i < len(item); i++ {
+		wg.Add(1)
+		// Copy of the result
+		copyOfResults := append([]string{}, result...)
+		// Recursion with remaining items
+		go iterate(wg, channel, append(copyOfResults, item[i]), items...)
 	}
-
-	return result
 }

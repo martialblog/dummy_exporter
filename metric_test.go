@@ -6,31 +6,15 @@ import (
 	"testing"
 )
 
-func TestPermute(t *testing.T) {
-	var actual = permute(
-		[]string{"job=foo", "job=bar"},
-		[]string{},
-		[]string{"in=1", "in=2", "in=3"},
-		[]string{"code=200"},
-	)
-
-	expected := []string{"job=fooin=1code=200", "job=fooin=2code=200", "job=fooin=3code=200", "job=barin=1code=200", "job=barin=2code=200", "job=barin=3code=200"}
-
-	if !reflect.DeepEqual(actual, expected) {
-		t.Error("Actual", actual, "Expected", expected)
-	}
-}
-
-func BenchmarkPermute(b *testing.B) {
+func BenchmarkProduct(b *testing.B) {
 	b.ReportAllocs()
+	x := [][]string{
+		{"1"},
+		{"2"},
+	}
 
 	for n := 0; n < b.N; n++ {
-		permute(
-			[]string{"job=foo", "job=bar"},
-			[]string{},
-			[]string{"in=1", "in=2", "in=3"},
-			[]string{"code=200"},
-		)
+		Product(x...)
 	}
 }
 
