@@ -78,7 +78,7 @@ func (m *Metric) RenderLabels() [][]string {
 		var at = make([]string, 0, len(m.Labels[name]))
 
 		for _, value := range m.Labels[name] {
-			at = append(at, fmt.Sprintf("%s=\"%s\",", name, value))
+			at = append(at, name+"=\""+value+"\",")
 		}
 
 		result = append(result, at)
