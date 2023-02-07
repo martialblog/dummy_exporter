@@ -37,6 +37,8 @@ func BenchmarkPermute(b *testing.B) {
 func BenchmarkRenderLabels(b *testing.B) {
 	m := Metric{
 		Name: "foo",
+		Min:  1,
+		Max:  1,
 		Labels: map[string][]string{
 			"x": []string{"1", "2"},
 			"y": []string{"1", "2", "3"},
@@ -59,6 +61,8 @@ func TestRenderLabels(t *testing.T) {
 		"simple": {
 			metric: Metric{
 				Name: "foo",
+				Min:  1,
+				Max:  1,
 				Labels: map[string][]string{
 					"m": []string{"1"},
 				},
@@ -70,6 +74,8 @@ func TestRenderLabels(t *testing.T) {
 		"sorted": {
 			metric: Metric{
 				Name: "foo",
+				Min:  1,
+				Max:  1,
 				Labels: map[string][]string{
 					"z": []string{"1", "2"},
 					"a": []string{"1", "2"},
@@ -103,6 +109,8 @@ func TestMetrics(t *testing.T) {
 		"no-type": {
 			metric: Metric{
 				Name: "foo",
+				Min:  1,
+				Max:  1,
 				Labels: map[string][]string{
 					"in": []string{"bar"},
 				},
@@ -112,6 +120,8 @@ func TestMetrics(t *testing.T) {
 		"wrong-type": {
 			metric: Metric{
 				Name: "foo",
+				Min:  1,
+				Max:  1,
 				Labels: map[string][]string{
 					"in": []string{"bar"},
 				},
@@ -122,6 +132,8 @@ func TestMetrics(t *testing.T) {
 		"gauge": {
 			metric: Metric{
 				Name: "foogauge",
+				Min:  1,
+				Max:  1,
 				Labels: map[string][]string{
 					"in": []string{"bar"},
 				},
@@ -132,6 +144,8 @@ func TestMetrics(t *testing.T) {
 		"counter": {
 			metric: Metric{
 				Name: "foocounter",
+				Min:  1,
+				Max:  1,
 				Labels: map[string][]string{
 					"job": []string{"foo"},
 				},

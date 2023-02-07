@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"sort"
@@ -20,8 +21,19 @@ type Metric struct {
 	Name   string              `json:"metric"`
 	Type   string              `json:"type"`
 	Labels map[string][]string `json:"labels"`
-	// Min    int                 `json:"min"`
-	// Max    int                 `json:"max"`
+	Min    int                 `json:"min"`
+	Max    int                 `json:"max"`
+}
+
+func (m *Metric) UnmarshalJSON(b []byte) error {
+	// Default values before unmarshaling
+	m.Type = "gauge"
+	m.Min = 1
+	m.Max = 10
+	// Create temporary struct
+	type Temp Metric
+	t := (*Temp)(m)
+	return json.Unmarshal(b, t)
 }
 
 // Renders the Metric in the Exposition Format with the given value.
@@ -40,12 +52,12 @@ func (m *Metric) String() string {
 	for _, lbs := range labels {
 		// If Gauge, use a random value
 		if m.Type == "gauge" {
-			value = rand.Intn(10-1) + 1
+			value = rand.Intn(m.Max-m.Min+1) + m.Min
 		}
 
 		// If Counter, increase counter and append
 		if m.Type == "counter" {
-			counters[lbs] = counters[lbs] + rand.Intn(10-1) + 1
+			counters[lbs] = counters[lbs] + rand.Intn(m.Max-m.Min+1) + m.Min
 			value = counters[lbs]
 		}
 

@@ -18,6 +18,8 @@ func TestServiceHTTP(t *testing.T) {
 				Metrics: []Metric{
 					Metric{
 						Name: "foogauge",
+						Min:  1,
+						Max:  1,
 						Labels: map[string][]string{
 							"foo": []string{"bar"},
 						},
@@ -32,6 +34,8 @@ func TestServiceHTTP(t *testing.T) {
 				Metrics: []Metric{
 					Metric{
 						Name: "foocounter",
+						Min:  1,
+						Max:  1,
 						Labels: map[string][]string{
 							"foo": []string{"bar"},
 						},
@@ -45,6 +49,8 @@ func TestServiceHTTP(t *testing.T) {
 			handler: DummyMetricHandler{
 				Metrics: []Metric{
 					Metric{
+						Min: 1,
+						Max: 1,
 						Labels: map[string][]string{
 							"foo": []string{"bar"},
 						},
