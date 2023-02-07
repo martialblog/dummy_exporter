@@ -4,9 +4,11 @@ dummy_exporter
 \#*
 .\#*
 
-# Coverage reports
+# Coverage and benchmark reports
 coverage.html
 coverage.out
+*.profile
+*.benchmark
 
 # Binaries for programs and plugins
 *.exe
