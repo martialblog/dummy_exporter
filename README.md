@@ -32,15 +32,17 @@ The configuration file is written in JSON (to rely solely on the Golang standard
 
 Dummy exporter will render metrics for each `labels` permutation.
 
-Gauge values are random on each call.
+Gauge values are random on each call. Counter are initialized at `0` and are incremented randomly on each call.
 
-Counter are initialized at `0` and are incremented randomly on each call.
+Random numbers are between 1 and 10 by default. The fields `min` and `max` can be set to define these for the random number generator. The generator is inclusive, meaning `min: 1` and `max: 1` can be used.
 
 ```json
 [
   {
   "metric":"foobar",
   "type": "counter",
+  "min": 1,
+  "max": 10,
   "labels": {
     "job": ["foo"],
     "instance": ["foo.1", "foo.2"]
