@@ -4,6 +4,7 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"time"
 )
 
 // nolint: gochecknoglobals
@@ -35,6 +36,7 @@ func main() {
 	http.Handle(*metricsPath, dummy)
 
 	// Let the User know where the metrics endpoint is
+	// nolint: errcheck
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`
 			<html>
@@ -49,5 +51,9 @@ func main() {
 	log.Printf("Version: %s Commit: %s", version, commit)
 	log.Printf("Listening on address: %s", *listenAddress)
 
-	log.Fatal(http.ListenAndServe(*listenAddress, nil))
+	srv := &http.Server{
+		Addr:              *listenAddress,
+		ReadHeaderTimeout: 5 * time.Second,
+	}
+	log.Fatal(srv.ListenAndServe())
 }
