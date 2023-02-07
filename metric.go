@@ -33,6 +33,7 @@ func (m *Metric) UnmarshalJSON(b []byte) error {
 
 	// Create temporary struct
 	type Temp Metric
+
 	t := (*Temp)(m)
 
 	err := json.Unmarshal(b, t)
@@ -59,8 +60,8 @@ func (m *Metric) UnmarshalJSON(b []byte) error {
 // # TYPE http_requests_total counter
 // http_requests_total{method="post",code="200"}
 func (m *Metric) String() string {
-
 	// Might be too obscure?
+	// There might be a better way.
 	if len(m.permutatedLabels) == 0 {
 		m.PermuteLabels()
 	}
@@ -72,12 +73,14 @@ func (m *Metric) String() string {
 
 	for _, lbs := range m.permutatedLabels {
 		// If Gauge, use a random value
+		// nolint: gosec
 		if m.Type == "gauge" {
 			value = rand.Intn(m.Max-m.Min+1) + m.Min
 		}
 
 		// If Counter, increase counter and append
 		if m.Type == "counter" {
+			// nolint: gosec
 			counters[lbs] = counters[lbs] + rand.Intn(m.Max-m.Min+1) + m.Min
 			value = counters[lbs]
 		}
@@ -110,6 +113,7 @@ func (m *Metric) PermuteLabels() {
 	for p := range l {
 		lbs = append(lbs, strings.Join(p, ""))
 	}
+
 	m.permutatedLabels = lbs
 }
 
@@ -125,6 +129,7 @@ func (m *Metric) RenderLabels() [][]string {
 	for k, _ := range m.Labels {
 		sortedLabels = append(sortedLabels, k)
 	}
+
 	sort.Strings(sortedLabels)
 
 	for _, name := range sortedLabels {
@@ -149,7 +154,9 @@ func (m *Metric) RenderLabels() [][]string {
 // A × B = {1,2} × {3,4} = {(1,3), (1,4), (2,3), (2,4)}
 func Product(items ...[]string) chan []string {
 	ch := make(chan []string)
+
 	var wg sync.WaitGroup
+
 	wg.Add(1)
 
 	iterate(&wg, ch, []string{}, items...)
@@ -173,6 +180,7 @@ func iterate(wg *sync.WaitGroup, channel chan []string, result []string, items .
 
 	for i := 0; i < len(item); i++ {
 		wg.Add(1)
+
 		// Copy of the result
 		copyOfResults := append([]string{}, result...)
 		// Recursion with remaining items

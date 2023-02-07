@@ -13,8 +13,6 @@ var (
 	commit  = "HEAD"
 )
 
-var build = "development"
-
 var (
 	listenAddress = flag.String("web.listen-address", ":9123", "Address on which to expose metrics and web interface.")
 	metricsPath   = flag.String("web.metrics-path", "/metrics", "Path under which to expose metrics.")
