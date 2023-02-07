@@ -16,13 +16,13 @@ func init() {
 	counters = make(map[string]int)
 }
 
-// TODO LabelName regexp.MustCompile("^[a-zA-Z_][a-zA-Z0-9_]*$")
 type Metric struct {
-	Name   string              `json:"metric"`
-	Type   string              `json:"type"`
-	Labels map[string][]string `json:"labels"`
-	Min    int                 `json:"min"`
-	Max    int                 `json:"max"`
+	Name             string              `json:"metric"`
+	Type             string              `json:"type"`
+	Labels           map[string][]string `json:"labels"`
+	Min              int                 `json:"min"`
+	Max              int                 `json:"max"`
+	permutatedLabels []string
 }
 
 func (m *Metric) UnmarshalJSON(b []byte) error {
@@ -30,10 +30,28 @@ func (m *Metric) UnmarshalJSON(b []byte) error {
 	m.Type = "gauge"
 	m.Min = 1
 	m.Max = 10
+
 	// Create temporary struct
 	type Temp Metric
 	t := (*Temp)(m)
-	return json.Unmarshal(b, t)
+
+	err := json.Unmarshal(b, t)
+
+	if err != nil {
+		return err
+	}
+
+	if m.Name == "" {
+		return fmt.Errorf("Metric Name cannot be empty")
+	}
+
+	if len(m.Labels) == 0 {
+		return fmt.Errorf("Metric Labels cannot be empty")
+	}
+
+	m.PermuteLabels()
+
+	return nil
 }
 
 // Renders the Metric in the Exposition Format with the given value.
@@ -41,15 +59,18 @@ func (m *Metric) UnmarshalJSON(b []byte) error {
 // # TYPE http_requests_total counter
 // http_requests_total{method="post",code="200"}
 func (m *Metric) String() string {
-	renderedLabels := m.RenderLabels()
-	labels := permute(renderedLabels...)
+
+	// Might be too obscure?
+	if len(m.permutatedLabels) == 0 {
+		m.PermuteLabels()
+	}
 
 	var (
 		sb    strings.Builder
 		value int
 	)
 
-	for _, lbs := range labels {
+	for _, lbs := range m.permutatedLabels {
 		// If Gauge, use a random value
 		if m.Type == "gauge" {
 			value = rand.Intn(m.Max-m.Min+1) + m.Min
@@ -70,6 +91,13 @@ func (m *Metric) String() string {
 	}
 
 	return sb.String()
+}
+
+// We precalculate these, since they do not change and are
+// computationally expensive
+func (m *Metric) PermuteLabels() {
+	renderedLabels := m.RenderLabels()
+	m.permutatedLabels = permute(renderedLabels...)
 }
 
 // Renders Labels (map of []string)

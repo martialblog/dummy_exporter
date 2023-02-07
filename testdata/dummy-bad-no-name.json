@@ -1,0 +1,8 @@
+[
+  {
+  "labels": {
+    "job": ["foo"],
+    "instance": ["foo.1", "foo.2"]
+  }
+}
+]

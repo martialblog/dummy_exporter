@@ -25,6 +25,14 @@ func TestLoadBadConfigs(t *testing.T) {
 			want: "Error during Unmarshal: invalid character ':' after array element",
 		},
 		{
+			file: "testdata/dummy-bad-no-name.json",
+			want: "Error during Unmarshal: Metric Name cannot be empty",
+		},
+		{
+			file: "testdata/dummy-bad-no-labels.json",
+			want: "Error during Unmarshal: Metric Labels cannot be empty",
+		},
+		{
 			file: "testdata/does-not-exists.json",
 			want: "Error while opening configuration: open testdata/does-not-exists.json: no such file or directory",
 		},
