@@ -36,7 +36,7 @@
   "type": "gauge",
   "labels": {
     "loc": ["fra"],
-    "device": ["t-100", "t-200"]
+    "device": ["t-100"]
   }
 },
   {
