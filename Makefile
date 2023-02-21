@@ -6,7 +6,7 @@ VERSION?=latest
 build:
 	go build
 release:
-	go build -ldflags="-s -w -X main.version=$(VERSION) -X main.commit=$(COMMIT)"
+	CGO_ENABLED=0 go build -ldflags="-s -w -X main.version=$(VERSION) -X main.commit=$(COMMIT)"
 lint:
 	go fmt $(go list ./... | grep -v /vendor/)
 vet:
