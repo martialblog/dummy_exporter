@@ -1,0 +1,30 @@
+[Unit]
+Description=A fully customizable Prometheus dummy exporter for testing, demonstrations and learning
+Documentation=https://github.com/martialblog/dummy_exporter
+After=network.target
+
+[Service]
+EnvironmentFile=-/etc/default/dummy_exporter
+User=dummy_exporter
+ExecStart=/usr/bin/dummy_exporter $DUMMY_EXPORTER_OPTS
+ExecReload=/bin/kill -HUP $MAINPID
+TimeoutStopSec=20s
+
+SendSIGKILL=no
+Restart=on-failure
+LockPersonality=true
+MemoryDenyWriteExecute=true
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+PrivateUsers=true
+ProtectHome=true
+ProtectControlGroups=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectSystem=full
+RemoveIPC=true
+RestrictNamespaces=true
+
+[Install]
+WantedBy=multi-user.target
