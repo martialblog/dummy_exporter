@@ -71,6 +71,9 @@ func (m *Metric) String() string {
 		value int
 	)
 
+	sb.WriteString(fmt.Sprintf("# HELP %s\n", m.Name))
+	sb.WriteString(fmt.Sprintf("# TYPE %s %s\n", m.Name, m.Type))
+
 	for _, lbs := range m.permutatedLabels {
 		// If Gauge, use a random value
 		// nolint: gosec
@@ -85,12 +88,7 @@ func (m *Metric) String() string {
 			value = counters[lbs]
 		}
 
-		s := fmt.Sprintf("%s\n%s\n%s\n",
-			fmt.Sprintf("# HELP %s", m.Name),
-			fmt.Sprintf("# TYPE %s %s", m.Name, m.Type),
-			fmt.Sprintf("dummy_%s{%s} %d", m.Name, strings.TrimRight(lbs, ","), value))
-
-		sb.WriteString(s)
+		sb.WriteString(fmt.Sprintf("dummy_%s{%s} %d\n", m.Name, strings.TrimRight(lbs, ","), value))
 	}
 
 	return sb.String()
