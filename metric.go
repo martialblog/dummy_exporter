@@ -23,6 +23,7 @@ type Metric struct {
 	Min              int                 `json:"min"`
 	Max              int                 `json:"max"`
 	Le               []float64           `json:"le"`
+	Quantile         []float64           `json:"quantile"`
 	permutatedLabels []string
 }
 
@@ -38,6 +39,7 @@ func (m *Metric) UnmarshalJSON(b []byte) error {
 	m.Min = 1
 	m.Max = 10
 	m.Le = []float64{}
+	m.Quantile = []float64{}
 
 	// Create temporary struct
 	type Temp Metric
@@ -59,6 +61,7 @@ func (m *Metric) UnmarshalJSON(b []byte) error {
 	}
 
 	sort.Float64s(m.Le)
+	sort.Float64s(m.Quantile)
 	m.PermuteLabels()
 
 	return nil
@@ -95,6 +98,20 @@ func (m *Metric) String() string {
 			counters[lbs] = counters[lbs] + randInt(m.Min, m.Max)
 			value = counters[lbs]
 			sb.WriteString(fmt.Sprintf("dummy_%s{%s} %d\n", m.Name, strings.TrimRight(lbs, ","), value))
+
+		case "summary":
+			// Summary, Set an initial counter for the lowest qu and increment it with a random value
+			// TODO Basically works, but still needs some polishing
+			counters[lbs] = counters[lbs] + randInt(m.Min, m.Max)
+			value = counters[lbs]
+
+			for _, qu := range m.Quantile {
+				value += randInt(m.Min, m.Max)
+				sb.WriteString(fmt.Sprintf("dummy_%s{%s quantile=\"%g\"} %d\n", m.Name, lbs, qu, value))
+			}
+			// Add count and sum
+			sb.WriteString(fmt.Sprintf("dummy_%s_count{%s} %d\n", m.Name, lbs, value))
+			sb.WriteString(fmt.Sprintf("dummy_%s_sum{%s} %d\n", m.Name, lbs, value*2))
 
 		case "histogram":
 			// Histogram, Set an initial counter for the lowest bucket and increment it with a random value

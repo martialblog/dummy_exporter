@@ -150,6 +150,19 @@ func TestMetrics(t *testing.T) {
 			},
 			expected: "# HELP foohist\n# TYPE foohist histogram\ndummy_foohist_bucket{job=\"fu\", le=\"0.1\"}",
 		},
+		"summary": {
+			metric: Metric{
+				Name: "foosum",
+				Min:  1,
+				Max:  1,
+				Labels: map[string][]string{
+					"job": []string{"fu"},
+				},
+				Quantile: []float64{0, 0.5, 1},
+				Type:     "summary",
+			},
+			expected: "# HELP foosum\n# TYPE foosum summary\ndummy_foosum{job=\"fu\", quantile=\"0\"}",
+		},
 	}
 
 	for name, tc := range testcases {
