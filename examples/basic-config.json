@@ -13,9 +13,18 @@
   "min": 1,
   "max": 10,
   "labels": {
-    "job": ["foo"],
+    "job": ["bar"],
     "instance": ["bar.1", "bar.2"],
     "code": ["200"]
   }
+},
+  {
+  "metric":"fubar",
+  "type": "histogram",
+  "labels": {
+    "job": ["fu"],
+    "instance": ["fu.1", "fu.2"]
+  },
+  "le": [0.1, 0.5, 0.99]
 }
 ]

@@ -137,6 +137,19 @@ func TestMetrics(t *testing.T) {
 			},
 			expected: "# HELP foocounter\n# TYPE foocounter counter\ndummy_foocounter{job=\"foo\"}",
 		},
+		"histogram": {
+			metric: Metric{
+				Name: "foohist",
+				Min:  1,
+				Max:  1,
+				Labels: map[string][]string{
+					"job": []string{"fu"},
+				},
+				Le:   []float64{0.1, 0.2, 0.99},
+				Type: "histogram",
+			},
+			expected: "# HELP foohist\n# TYPE foohist histogram\ndummy_foohist_bucket{job=\"fu\", le=\"0.1\"}",
+		},
 	}
 
 	for name, tc := range testcases {
