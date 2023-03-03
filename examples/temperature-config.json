@@ -46,5 +46,12 @@
     "loc": ["fra"],
     "device": ["t-9000", "t-9001"]
   }
+},
+  {
+  "metric":"measurements_total",
+  "type": "counter",
+  "labels": {
+    "region": ["germany"]
+  }
 }
 ]
