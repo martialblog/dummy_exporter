@@ -1,16 +1,47 @@
+version: "2"
 run:
-  skip-files:
-    - '(.+)_test\.go'
-
+  tests: false
 linters:
-  disable-all: false
+  default: all
+  disable:
+    - cyclop
+    - depguard
+    - err113
+    - exhaustruct
+    - forbidigo
+    - forcetypeassert
+    - funlen
+    - gochecknoglobals
+    - gochecknoinits
+    - godot
+    - godox
+    - lll
+    - mnd
+    - musttag
+    - nlreturn
+    - nolintlint
+    - nonamedreturns
+    - tagliatelle
+    - varnamelen
+    - wrapcheck
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
   enable:
-    - dogsled
-    - dupl
-    - whitespace
-    - wsl
-    - exportloopref
-  presets:
-    - bugs
-    - unused
-  fast: false
+    - gofmt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

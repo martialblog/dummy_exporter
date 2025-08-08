@@ -10,7 +10,7 @@ func TestLoadConfig(t *testing.T) {
 	err := config.LoadConfig("testdata/dummy-good.json")
 
 	if err != nil {
-		t.Errorf("Error loading config %v: %v", "dummy-good.json", err)
+		t.Errorf("error loading config %v: %v", "dummy-good.json", err)
 	}
 }
 
@@ -22,19 +22,19 @@ func TestLoadBadConfigs(t *testing.T) {
 	}{
 		{
 			file: "testdata/dummy-invalid.json",
-			want: "Error during Unmarshal: invalid character ':' after array element",
+			want: "error during Unmarshal: invalid character ':' after array element",
 		},
 		{
 			file: "testdata/dummy-bad-no-name.json",
-			want: "Error during Unmarshal: Metric Name cannot be empty",
+			want: "error during Unmarshal: metric Name cannot be empty",
 		},
 		{
 			file: "testdata/dummy-bad-no-labels.json",
-			want: "Error during Unmarshal: Metric Labels cannot be empty",
+			want: "error during Unmarshal: metric Labels cannot be empty",
 		},
 		{
 			file: "testdata/does-not-exists.json",
-			want: "Error while opening configuration: open testdata/does-not-exists.json: no such file or directory",
+			want: "error while opening configuration: open testdata/does-not-exists.json: no such file or directory",
 		},
 	}
 

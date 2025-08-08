@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math/rand"
 	"sort"
@@ -28,9 +29,9 @@ type Metric struct {
 }
 
 // Returns a random int between min and max
-func randInt(min int, max int) int {
+func randInt(minN int, maxN int) int {
 	// nolint: gosec
-	return rand.Intn(max-min+1) + min
+	return rand.Intn(maxN-minN+1) + minN
 }
 
 func (m *Metric) UnmarshalJSON(b []byte) error {
@@ -53,11 +54,11 @@ func (m *Metric) UnmarshalJSON(b []byte) error {
 	}
 
 	if m.Name == "" {
-		return fmt.Errorf("Metric Name cannot be empty")
+		return errors.New("metric Name cannot be empty")
 	}
 
 	if len(m.Labels) == 0 {
-		return fmt.Errorf("Metric Labels cannot be empty")
+		return errors.New("metric Labels cannot be empty")
 	}
 
 	sort.Float64s(m.Le)
@@ -95,14 +96,14 @@ func (m *Metric) String() string {
 
 		case "counter":
 			// Counter, Set the counter and increment it with a random value
-			counters[lbs] = counters[lbs] + randInt(m.Min, m.Max)
+			counters[lbs] += randInt(m.Min, m.Max)
 			value = counters[lbs]
 			sb.WriteString(fmt.Sprintf("dummy_%s{%s} %d\n", m.Name, strings.TrimRight(lbs, ","), value))
 
 		case "summary":
 			// Summary, Set an initial counter for the lowest qu and increment it with a random value
 			// TODO Basically works, but still needs some polishing
-			counters[lbs] = counters[lbs] + randInt(m.Min, m.Max)
+			counters[lbs] += randInt(m.Min, m.Max)
 			value = counters[lbs]
 
 			for _, qu := range m.Quantile {
@@ -115,7 +116,7 @@ func (m *Metric) String() string {
 
 		case "histogram":
 			// Histogram, Set an initial counter for the lowest bucket and increment it with a random value
-			counters[lbs] = counters[lbs] + randInt(m.Min, m.Max)
+			counters[lbs] += randInt(m.Min, m.Max)
 			value = counters[lbs]
 
 			for _, le := range m.Le {
@@ -143,13 +144,13 @@ func (m *Metric) PermuteLabels() {
 	l := Product(renderedLabels...)
 
 	// Calculate capacity
-	cap := 0
+	capacity := 0
 	for _, v := range m.Labels {
-		cap = +len(v)
+		capacity = +len(v)
 	}
 
 	// for m.Lables =+ len(lab)
-	lbs := make([]string, 0, cap)
+	lbs := make([]string, 0, capacity)
 	for p := range l {
 		lbs = append(lbs, strings.Join(p, ""))
 	}
@@ -165,9 +166,9 @@ func (m *Metric) PermuteLabels() {
 func (m *Metric) RenderLabels() [][]string {
 	result := make([][]string, 0, len(m.Labels))
 
-	//Sort Labels
+	// Sort Labels
 	sortedLabels := make([]string, 0, len(m.Labels))
-	for k, _ := range m.Labels {
+	for k := range m.Labels {
 		sortedLabels = append(sortedLabels, k)
 	}
 
