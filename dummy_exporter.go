@@ -29,15 +29,13 @@ func main() {
 		log.Fatal("Error loading config", "err", err)
 	}
 
-	dummy := DummyMetricHandler{
-		Metrics: config.Metrics,
-	}
+	dummy := DummyMetricHandler(config)
 
 	http.Handle(*metricsPath, dummy)
 
 	// Let the User know where the metrics endpoint is
 	// nolint: errcheck
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
 		w.Write([]byte(`
 			<html>
 			<head><title>Dummy Exporter</title></head>
