@@ -1,4 +1,6 @@
+# Build
 dummy_exporter
+dist/
 
 # Editor
 \#*
