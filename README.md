@@ -1,6 +1,6 @@
 # Dummy exporter
 
-The dummy exporter is a customizable metric exporter for testing, demonstrations and learning.
+The dummy exporter is a customizable metric exporter for testing, demos and learning.
 
 ## Running this software
 
