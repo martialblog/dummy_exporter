@@ -25,6 +25,7 @@ type Metric struct {
 	Max              int                 `json:"max"`
 	Le               []float64           `json:"le"`
 	Quantile         []float64           `json:"quantile"`
+	Prefix           string              `json:"prefix,omitempty"`
 	permutatedLabels []string
 }
 
@@ -36,6 +37,7 @@ func randInt(minN int, maxN int) int {
 
 func (m *Metric) UnmarshalJSON(b []byte) error {
 	// Default values before unmarshaling
+	m.Prefix = "dummy_"
 	m.Type = "gauge"
 	m.Min = 1
 	m.Max = 10
@@ -48,7 +50,6 @@ func (m *Metric) UnmarshalJSON(b []byte) error {
 	t := (*Temp)(m)
 
 	err := json.Unmarshal(b, t)
-
 	if err != nil {
 		return err
 	}
@@ -68,7 +69,7 @@ func (m *Metric) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// Renders the Metric in the Exposition Format with the given value.
+// String renders the Metric in the Exposition Format with the given value.
 // # HELP http_requests_total The total number of HTTP requests.
 // # TYPE http_requests_total counter
 // http_requests_total{method="post",code="200"}
@@ -84,21 +85,21 @@ func (m *Metric) String() string {
 		value int
 	)
 
-	sb.WriteString(fmt.Sprintf("# HELP %s\n", m.Name))
-	sb.WriteString(fmt.Sprintf("# TYPE %s %s\n", m.Name, m.Type))
+	fmt.Fprintf(&sb, "# HELP %s\n", m.Name)
+	fmt.Fprintf(&sb, "# TYPE %s %s\n", m.Name, m.Type)
 
 	for _, lbs := range m.permutatedLabels {
 		switch m.Type {
 		case "gauge":
 			// Gauge, return a random value
 			value = randInt(m.Min, m.Max)
-			sb.WriteString(fmt.Sprintf("dummy_%s{%s} %d\n", m.Name, strings.TrimRight(lbs, ","), value))
+			fmt.Fprintf(&sb, "%s%s{%s} %d\n", m.Prefix, m.Name, strings.TrimRight(lbs, ","), value)
 
 		case "counter":
 			// Counter, Set the counter and increment it with a random value
 			counters[lbs] += randInt(m.Min, m.Max)
 			value = counters[lbs]
-			sb.WriteString(fmt.Sprintf("dummy_%s{%s} %d\n", m.Name, strings.TrimRight(lbs, ","), value))
+			fmt.Fprintf(&sb, "%s%s{%s} %d\n", m.Prefix, m.Name, strings.TrimRight(lbs, ","), value)
 
 		case "summary":
 			// Summary, Set an initial counter for the lowest qu and increment it with a random value
@@ -108,11 +109,11 @@ func (m *Metric) String() string {
 
 			for _, qu := range m.Quantile {
 				value += randInt(m.Min, m.Max)
-				sb.WriteString(fmt.Sprintf("dummy_%s{%s quantile=\"%g\"} %d\n", m.Name, lbs, qu, value))
+				fmt.Fprintf(&sb, "%s%s{%s quantile=\"%g\"} %d\n", m.Prefix, m.Name, lbs, qu, value)
 			}
 			// Add count and sum
-			sb.WriteString(fmt.Sprintf("dummy_%s_count{%s} %d\n", m.Name, lbs, value))
-			sb.WriteString(fmt.Sprintf("dummy_%s_sum{%s} %d\n", m.Name, lbs, value*2))
+			fmt.Fprintf(&sb, "%s%s_count{%s} %d\n", m.Prefix, m.Name, lbs, value)
+			fmt.Fprintf(&sb, "%s%s_sum{%s} %d\n", m.Prefix, m.Name, lbs, value*2)
 
 		case "histogram":
 			// Histogram, Set an initial counter for the lowest bucket and increment it with a random value
@@ -121,23 +122,23 @@ func (m *Metric) String() string {
 
 			for _, le := range m.Le {
 				value += randInt(m.Min, m.Max)
-				sb.WriteString(fmt.Sprintf("dummy_%s_bucket{%s le=\"%g\"} %d\n", m.Name, lbs, le, value))
+				fmt.Fprintf(&sb, "%s%s_bucket{%s le=\"%g\"} %d\n", m.Prefix, m.Name, lbs, le, value)
 			}
 			// Add final +Inf bucket
-			sb.WriteString(fmt.Sprintf("dummy_%s_bucket{%s le=\"+Inf\"} %d\n", m.Name, lbs, value))
+			fmt.Fprintf(&sb, "%s%s_bucket{%s le=\"+Inf\"} %d\n", m.Prefix, m.Name, lbs, value)
 			// Add count and sum
-			sb.WriteString(fmt.Sprintf("dummy_%s_count{%s} %d\n", m.Name, lbs, value))
-			sb.WriteString(fmt.Sprintf("dummy_%s_sum{%s} %d\n", m.Name, lbs, value*2))
+			fmt.Fprintf(&sb, "%s%s_count{%s} %d\n", m.Prefix, m.Name, lbs, value)
+			fmt.Fprintf(&sb, "%s%s_sum{%s} %d\n", m.Prefix, m.Name, lbs, value*2)
 
 		default:
-			sb.WriteString(fmt.Sprintf("dummy_%s{%s} %d\n", m.Name, strings.TrimRight(lbs, ","), value))
+			fmt.Fprintf(&sb, "%s%s{%s} %d\n", m.Prefix, m.Name, strings.TrimRight(lbs, ","), value)
 		}
 	}
 
 	return sb.String()
 }
 
-// We precalculate these, since they do not change and are
+// PermuteLabels precalculate permutated the labels, since they do not change and are
 // computationally expensive
 func (m *Metric) PermuteLabels() {
 	renderedLabels := m.RenderLabels()
@@ -159,8 +160,8 @@ func (m *Metric) PermuteLabels() {
 	m.permutatedLabels = lbs
 }
 
-// Renders Labels (map of []string)
-// into a [][]string containing
+// RenderLabels returns labels (map of []string)
+// as a [][]string containing
 // the labels ready to print. E.g.
 // [{x="foo",}, {x="bar",}]
 func (m *Metric) RenderLabels() [][]string {
@@ -192,7 +193,7 @@ func (m *Metric) RenderLabels() [][]string {
 	return result
 }
 
-// Generates all combinations from a slice of slices
+// Product generates all combinations from a slice of slices
 // A × B = {1,2} × {3,4} = {(1,3), (1,4), (2,3), (2,4)}
 func Product(items ...[]string) chan []string {
 	ch := make(chan []string)
@@ -220,7 +221,7 @@ func iterate(wg *sync.WaitGroup, channel chan []string, result []string, items .
 	// Shift Items
 	item, items := items[0], items[1:]
 
-	for i := 0; i < len(item); i++ {
+	for i := range item {
 		wg.Add(1)
 
 		// Copy of the result

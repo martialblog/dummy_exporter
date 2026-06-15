@@ -92,9 +92,10 @@ func TestMetrics(t *testing.T) {
 	}{
 		"no-type": {
 			metric: Metric{
-				Name: "foo",
-				Min:  1,
-				Max:  1,
+				Name:   "foo",
+				Min:    1,
+				Max:    1,
+				Prefix: "dummy_",
 				Labels: map[string][]string{
 					"in": []string{"bar"},
 				},
@@ -103,9 +104,10 @@ func TestMetrics(t *testing.T) {
 		},
 		"wrong-type": {
 			metric: Metric{
-				Name: "foo",
-				Min:  1,
-				Max:  1,
+				Name:   "foo",
+				Min:    1,
+				Max:    1,
+				Prefix: "dummy_",
 				Labels: map[string][]string{
 					"in": []string{"bar"},
 				},
@@ -115,9 +117,10 @@ func TestMetrics(t *testing.T) {
 		},
 		"gauge": {
 			metric: Metric{
-				Name: "foogauge",
-				Min:  1,
-				Max:  1,
+				Name:   "foogauge",
+				Min:    1,
+				Max:    1,
+				Prefix: "dummy_",
 				Labels: map[string][]string{
 					"in": []string{"bar"},
 				},
@@ -127,9 +130,10 @@ func TestMetrics(t *testing.T) {
 		},
 		"counter": {
 			metric: Metric{
-				Name: "foocounter",
-				Min:  1,
-				Max:  1,
+				Name:   "foocounter",
+				Min:    1,
+				Max:    1,
+				Prefix: "dummy_",
 				Labels: map[string][]string{
 					"job": []string{"foo"},
 				},
@@ -139,9 +143,10 @@ func TestMetrics(t *testing.T) {
 		},
 		"histogram": {
 			metric: Metric{
-				Name: "foohist",
-				Min:  1,
-				Max:  1,
+				Name:   "foohist",
+				Min:    1,
+				Max:    1,
+				Prefix: "dummy_",
 				Labels: map[string][]string{
 					"job": []string{"fu"},
 				},
@@ -152,9 +157,10 @@ func TestMetrics(t *testing.T) {
 		},
 		"summary": {
 			metric: Metric{
-				Name: "foosum",
-				Min:  1,
-				Max:  1,
+				Name:   "foosum",
+				Min:    1,
+				Max:    1,
+				Prefix: "dummy_",
 				Labels: map[string][]string{
 					"job": []string{"fu"},
 				},

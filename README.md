@@ -69,6 +69,7 @@ Random numbers are between 1 and 10 by default. The fields `min` and `max` can b
   {
   "metric":"bar_seconds",
   "type": "summary",
+  "prefix": "example_",
   "labels": {
     "job": ["foo"],
     "instance": ["fuu.1", "fuu.2"]
