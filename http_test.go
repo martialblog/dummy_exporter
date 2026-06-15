@@ -17,9 +17,10 @@ func TestServiceHTTP(t *testing.T) {
 			handler: DummyMetricHandler{
 				Metrics: []Metric{
 					Metric{
-						Name: "foogauge",
-						Min:  1,
-						Max:  1,
+						Name:   "foogauge",
+						Min:    1,
+						Max:    1,
+						Prefix: "dummy_",
 						Labels: map[string][]string{
 							"foo": []string{"bar"},
 						},

@@ -25,6 +25,7 @@ type Metric struct {
 	Max              int                 `json:"max"`
 	Le               []float64           `json:"le"`
 	Quantile         []float64           `json:"quantile"`
+	Prefix           string              `json:"prefix,omitempty"`
 	permutatedLabels []string
 }
 
@@ -36,6 +37,7 @@ func randInt(minN int, maxN int) int {
 
 func (m *Metric) UnmarshalJSON(b []byte) error {
 	// Default values before unmarshaling
+	m.Prefix = "dummy_"
 	m.Type = "gauge"
 	m.Min = 1
 	m.Max = 10
@@ -92,13 +94,13 @@ func (m *Metric) String() string {
 		case "gauge":
 			// Gauge, return a random value
 			value = randInt(m.Min, m.Max)
-			sb.WriteString(fmt.Sprintf("dummy_%s{%s} %d\n", m.Name, strings.TrimRight(lbs, ","), value))
+			sb.WriteString(fmt.Sprintf("%s%s{%s} %d\n", m.Prefix, m.Name, strings.TrimRight(lbs, ","), value))
 
 		case "counter":
 			// Counter, Set the counter and increment it with a random value
 			counters[lbs] += randInt(m.Min, m.Max)
 			value = counters[lbs]
-			sb.WriteString(fmt.Sprintf("dummy_%s{%s} %d\n", m.Name, strings.TrimRight(lbs, ","), value))
+			sb.WriteString(fmt.Sprintf("%s%s{%s} %d\n", m.Prefix, m.Name, strings.TrimRight(lbs, ","), value))
 
 		case "summary":
 			// Summary, Set an initial counter for the lowest qu and increment it with a random value
@@ -108,11 +110,11 @@ func (m *Metric) String() string {
 
 			for _, qu := range m.Quantile {
 				value += randInt(m.Min, m.Max)
-				sb.WriteString(fmt.Sprintf("dummy_%s{%s quantile=\"%g\"} %d\n", m.Name, lbs, qu, value))
+				sb.WriteString(fmt.Sprintf("%s%s{%s quantile=\"%g\"} %d\n", m.Prefix, m.Name, lbs, qu, value))
 			}
 			// Add count and sum
-			sb.WriteString(fmt.Sprintf("dummy_%s_count{%s} %d\n", m.Name, lbs, value))
-			sb.WriteString(fmt.Sprintf("dummy_%s_sum{%s} %d\n", m.Name, lbs, value*2))
+			sb.WriteString(fmt.Sprintf("%s%s_count{%s} %d\n", m.Prefix, m.Name, lbs, value))
+			sb.WriteString(fmt.Sprintf("%s%s_sum{%s} %d\n", m.Prefix, m.Name, lbs, value*2))
 
 		case "histogram":
 			// Histogram, Set an initial counter for the lowest bucket and increment it with a random value
@@ -121,16 +123,16 @@ func (m *Metric) String() string {
 
 			for _, le := range m.Le {
 				value += randInt(m.Min, m.Max)
-				sb.WriteString(fmt.Sprintf("dummy_%s_bucket{%s le=\"%g\"} %d\n", m.Name, lbs, le, value))
+				sb.WriteString(fmt.Sprintf("%s%s_bucket{%s le=\"%g\"} %d\n", m.Prefix, m.Name, lbs, le, value))
 			}
 			// Add final +Inf bucket
-			sb.WriteString(fmt.Sprintf("dummy_%s_bucket{%s le=\"+Inf\"} %d\n", m.Name, lbs, value))
+			sb.WriteString(fmt.Sprintf("%s%s_bucket{%s le=\"+Inf\"} %d\n", m.Prefix, m.Name, lbs, value))
 			// Add count and sum
-			sb.WriteString(fmt.Sprintf("dummy_%s_count{%s} %d\n", m.Name, lbs, value))
-			sb.WriteString(fmt.Sprintf("dummy_%s_sum{%s} %d\n", m.Name, lbs, value*2))
+			sb.WriteString(fmt.Sprintf("%s%s_count{%s} %d\n", m.Prefix, m.Name, lbs, value))
+			sb.WriteString(fmt.Sprintf("%s%s_sum{%s} %d\n", m.Prefix, m.Name, lbs, value*2))
 
 		default:
-			sb.WriteString(fmt.Sprintf("dummy_%s{%s} %d\n", m.Name, strings.TrimRight(lbs, ","), value))
+			sb.WriteString(fmt.Sprintf("%s%s{%s} %d\n", m.Prefix, m.Name, strings.TrimRight(lbs, ","), value))
 		}
 	}
 
