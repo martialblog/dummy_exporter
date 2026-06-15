@@ -25,7 +25,8 @@ func main() {
 
 	var config Config
 
-	if err := config.LoadConfig(*configPath); err != nil {
+	err := config.LoadConfig(*configPath)
+	if err != nil {
 		log.Fatal("Error loading config", "err", err)
 	}
 
