@@ -10,11 +10,34 @@ import (
 	"sync"
 )
 
-// Counters for the Counter metrics
-var counters map[string]int
+// Counter stores the state of the counter metrics
+type Counter struct {
+	mu     sync.RWMutex
+	values map[string]int
+}
 
+func (c *Counter) Increment(key string, minInt int, maxInt int) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	c.values[key] += randInt(minInt, maxInt)
+}
+
+func (c *Counter) GetValue(key string) int {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	// It's a dummy tool, no need to check if the key exists
+	return c.values[key]
+}
+
+var counter Counter
+
+// init initializes the global counter
+// I know it's global state, but it's a dummy tool
 func init() {
-	counters = make(map[string]int)
+	counter = Counter{
+		values: make(map[string]int),
+	}
 }
 
 type Metric struct {
@@ -97,15 +120,15 @@ func (m *Metric) String() string {
 
 		case "counter":
 			// Counter, Set the counter and increment it with a random value
-			counters[lbs] += randInt(m.Min, m.Max)
-			value = counters[lbs]
+			counter.Increment(lbs, m.Min, m.Max)
+			value = counter.GetValue(lbs)
 			fmt.Fprintf(&sb, "%s%s{%s} %d\n", m.Prefix, m.Name, strings.TrimRight(lbs, ","), value)
 
 		case "summary":
 			// Summary, Set an initial counter for the lowest qu and increment it with a random value
 			// TODO Basically works, but still needs some polishing
-			counters[lbs] += randInt(m.Min, m.Max)
-			value = counters[lbs]
+			counter.Increment(lbs, m.Min, m.Max)
+			value = counter.GetValue(lbs)
 
 			for _, qu := range m.Quantile {
 				value += randInt(m.Min, m.Max)
@@ -117,8 +140,8 @@ func (m *Metric) String() string {
 
 		case "histogram":
 			// Histogram, Set an initial counter for the lowest bucket and increment it with a random value
-			counters[lbs] += randInt(m.Min, m.Max)
-			value = counters[lbs]
+			counter.Increment(lbs, m.Min, m.Max)
+			value = counter.GetValue(lbs)
 
 			for _, le := range m.Le {
 				value += randInt(m.Min, m.Max)

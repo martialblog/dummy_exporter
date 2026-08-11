@@ -16,6 +16,8 @@ func (h DummyMetricHandler) ServeHTTP(w http.ResponseWriter, _ *http.Request) {
 			continue
 		}
 
+		w.Header().Set("Content-Type", "text/plain; version=0.0.4; charset=utf-8")
+
 		fmt.Fprintln(w, metric.String())
 	}
 }
