@@ -29,7 +29,7 @@ jobs:
         run: go build -v .
 
       - name: Setup Syft
-      - uses: anchore/sbom-action/download-syft@e22c389904149dbc22b58101806040fa8d37a610 # v0.24.0
+        uses: anchore/sbom-action/download-syft@e22c389904149dbc22b58101806040fa8d37a610 # v0.24.0
 
       - name: Release
         if: success() && startsWith(github.ref, 'refs/tags/v')
